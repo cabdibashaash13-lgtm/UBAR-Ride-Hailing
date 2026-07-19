@@ -1,0 +1,313 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ─── ENUMS ────────────────────────────────────────────────
+
+enum UserRole {
+  PASSENGER
+  DRIVER
+  ADMIN
+}
+
+enum VehicleType {
+  BAJAJ
+  MOTORCYCLE
+}
+
+enum DriverStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  BLOCKED
+}
+
+enum TripStatus {
+  REQUESTED
+  ACCEPTED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum PaymentMethod {
+  EVC_PLUS
+  SAHAL
+  EDAHAB
+  KAAH
+  CASH
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+enum Currency {
+  SOS
+  USD
+}
+
+enum DocumentType {
+  NATIONAL_ID
+  NIRA
+  PASSPORT
+}
+
+enum DocumentStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum NotificationType {
+  RIDE_REQUEST
+  RIDE_ACCEPTED
+  RIDE_STARTED
+  RIDE_COMPLETED
+  RIDE_CANCELLED
+  PAYMENT
+  SYSTEM
+}
+
+// ─── MODELS ───────────────────────────────────────────────
+
+model User {
+  id        String   @id @default(uuid())
+  email     String?  @unique
+  phone     String   @unique
+  password  String?
+  fullName  String
+  photoUrl  String?
+  role      UserRole @default(PASSENGER)
+  cityId    String?
+  city      City?    @relation(fields: [cityId], references: [id])
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  passenger       Passenger?
+  driver          Driver?
+  admin           Admin?
+  notifications   Notification[]
+  sentRatings     Rating[]        @relation("RatingByUser")
+
+  @@map("users")
+}
+
+model Passenger {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  trips    Trip[]
+  payments Payment[]
+
+  @@map("passengers")
+}
+
+model Driver {
+  id             String       @id @default(uuid())
+  userId         String       @unique
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status         DriverStatus @default(PENDING)
+  isOnline       Boolean      @default(false)
+  currentLat     Float?
+  currentLng     Float?
+  rating         Float        @default(0)
+  totalRatings   Int          @default(0)
+  totalTrips     Int          @default(0)
+  totalEarnings  Float        @default(0)
+  rejectionNote  String?
+  approvedAt     DateTime?
+  rejectedAt     DateTime?
+  blockedAt      DateTime?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  vehicle              Vehicle?
+  verificationDocument VerificationDocument?
+  trips                Trip[]
+  earnings             Earning[]
+
+  @@map("drivers")
+}
+
+model Vehicle {
+  id          String      @id @default(uuid())
+  driverId    String      @unique
+  driver      Driver      @relation(fields: [driverId], references: [id], onDelete: Cascade)
+  type        VehicleType
+  plateNumber String      @unique
+  model       String?
+  color       String?
+  year        Int?
+  isActive    Boolean     @default(true)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@map("vehicles")
+}
+
+model VerificationDocument {
+  id             String         @id @default(uuid())
+  driverId       String         @unique
+  driver         Driver         @relation(fields: [driverId], references: [id], onDelete: Cascade)
+  documentType   DocumentType
+  documentNumber String
+  photoUrl       String
+  status         DocumentStatus @default(PENDING)
+  reviewedAt     DateTime?
+  reviewedBy     String?
+  notes          String?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  @@map("verification_documents")
+}
+
+model Trip {
+  id                String     @id @default(uuid())
+  passengerId       String
+  passenger         Passenger  @relation(fields: [passengerId], references: [id])
+  driverId          String?
+  driver            Driver?    @relation(fields: [driverId], references: [id])
+  status            TripStatus @default(REQUESTED)
+  vehicleType       VehicleType
+
+  // Location
+  pickupLat         Float
+  pickupLng         Float
+  pickupAddress     String?
+  dropoffLat        Float?
+  dropoffLng        Float?
+  dropoffAddress    String?
+
+  // Trip details
+  distanceKm        Float?
+  durationMinutes   Int?
+  fare              Float?
+  currency          Currency   @default(USD)
+
+  // Timestamps
+  requestedAt       DateTime   @default(now())
+  acceptedAt        DateTime?
+  startedAt         DateTime?
+  completedAt       DateTime?
+  cancelledAt       DateTime?
+  cancelReason      String?
+
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+
+  payment           Payment?
+  rating            Rating?
+
+  @@map("trips")
+}
+
+model Payment {
+  id          String        @id @default(uuid())
+  tripId      String        @unique
+  trip        Trip          @relation(fields: [tripId], references: [id])
+  passengerId String
+  passenger   Passenger     @relation(fields: [passengerId], references: [id])
+  method      PaymentMethod
+  amount      Float
+  currency    Currency      @default(USD)
+  status      PaymentStatus @default(PENDING)
+  reference   String?
+  paidAt      DateTime?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@map("payments")
+}
+
+model Rating {
+  id          String   @id @default(uuid())
+  tripId      String   @unique
+  trip        Trip     @relation(fields: [tripId], references: [id])
+  ratedById   String
+  ratedBy     User     @relation("RatingByUser", fields: [ratedById], references: [id])
+  stars       Int
+  comment     String?
+  createdAt   DateTime @default(now())
+
+  @@map("ratings")
+}
+
+model Earning {
+  id        String   @id @default(uuid())
+  driverId  String
+  driver    Driver   @relation(fields: [driverId], references: [id])
+  tripId    String?
+  amount    Float
+  currency  Currency @default(USD)
+  date      DateTime @default(now())
+  createdAt DateTime @default(now())
+
+  @@map("earnings")
+}
+
+model Notification {
+  id        String           @id @default(uuid())
+  userId    String
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      NotificationType
+  title     String
+  body      String
+  data      Json?
+  isRead    Boolean          @default(false)
+  createdAt DateTime         @default(now())
+
+  @@map("notifications")
+}
+
+model City {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  nameSo    String?
+  country   String   @default("Somalia")
+  lat       Float?
+  lng       Float?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users     User[]
+
+  @@map("cities")
+}
+
+model Setting {
+  id        String   @id @default(uuid())
+  key       String   @unique
+  value     String
+  label     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("settings")
+}
+
+model Admin {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  isSuper   Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("admins")
+}

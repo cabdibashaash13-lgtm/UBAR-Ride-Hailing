@@ -1,0 +1,26 @@
+{
+  "name": "ubar",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:passenger": "npm run dev --workspace=apps/passenger",
+    "dev:driver": "npm run dev --workspace=apps/driver",
+    "dev:admin": "npm run dev --workspace=apps/admin",
+    "dev:socket": "npm run dev --workspace=packages/real-time",
+    "dev": "concurrently \"npm run dev:passenger\" \"npm run dev:driver\" \"npm run dev:admin\" \"npm run dev:socket\"",
+    "build": "npm run build --workspaces",
+    "db:generate": "npm run generate --workspace=packages/prisma",
+    "db:push": "npm run push --workspace=packages/prisma",
+    "db:seed": "npm run seed --workspace=packages/prisma",
+    "db:migrate": "npm run migrate --workspace=packages/prisma",
+    "db:studio": "npm run studio --workspace=packages/prisma"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0",
+    "typescript": "^5.7.0"
+  }
+}

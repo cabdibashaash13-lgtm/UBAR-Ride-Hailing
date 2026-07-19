@@ -1,0 +1,314 @@
+Build a Complete Somalia Bajaj & Motorcycle Ride-Hailing Application
+
+Create a modern, production-ready ride-hailing mobile and web platform designed specifically for Somalia. The application should work like Uber/Bolt but focus mainly on Bajaj (Tuk-Tuk) and Motorcycle transportation.
+
+The system should connect passengers with nearby Bajaj and Motorcycle drivers using GPS, maps, and real-time ride requests.
+
+---
+
+Technology Stack
+
+Frontend
+
+- Next.js 15
+- TypeScript
+- Tailwind CSS
+- ShadCN UI
+- Framer Motion
+- Responsive Mobile-First Design
+
+Backend
+
+- Node.js
+- API Routes
+- Prisma ORM
+- PostgreSQL Database
+
+Services
+
+- Supabase Authentication
+- Google Maps API
+- Socket.io Real-Time Tracking
+- Firebase Push Notifications
+- Cloudinary Image Upload
+
+---
+
+User Roles
+
+The system has three main users:
+
+1. Passenger
+2. Bajaj/Motorcycle Driver
+3. Administrator
+
+---
+
+Passenger Application Features
+
+Account
+
+- Register using phone number
+- Login
+- Profile management
+
+Ride Request
+
+Passenger can:
+
+- Automatically detect current location using GPS
+- Select destination on map
+- Choose vehicle type:
+  - 🛺 Bajaj
+  - 🛵 Motorcycle
+
+The system should show:
+
+- Estimated distance
+- Estimated travel time
+- Estimated price
+
+Passenger can:
+
+- Request Ride
+- Cancel Ride
+- Track Driver Live on Map
+- Contact Driver
+- View Driver Information
+
+---
+
+Driver Application Features
+
+Simple Driver Registration
+
+When a Bajaj or Motorcycle driver registers, collect only:
+
+1. Full Name
+2. Driver Profile Photo
+3. Vehicle Plate Number
+4. Identification Type:
+   - National ID
+   - NIRA Card
+   - Passport
+5. Identification Number
+6. Phone Number
+
+---
+
+Driver Verification System
+
+- New drivers have Pending status.
+- Admin reviews driver information.
+- Admin can Approve or Reject drivers.
+- Approved drivers receive Verified Badge.
+- Only verified drivers can receive ride requests.
+
+---
+
+Driver Features
+
+After approval:
+
+- Login to Driver App
+- Online / Offline status
+- Receive nearby ride requests
+- Accept or reject requests
+- View passenger location
+- Navigate using Maps
+- Start Trip
+- Complete Trip
+- View daily earnings
+- View ride history
+- Receive ratings
+
+---
+
+Passenger After Driver Acceptance
+
+Display:
+
+- Driver Name
+- Driver Photo
+- Vehicle Type
+- Bajaj/Motorcycle Plate Number
+- Driver Rating
+- Live Location
+- Estimated Arrival Time
+
+---
+
+Ride Process Flow
+
+1. Passenger opens app.
+2. GPS finds passenger location.
+3. Passenger selects destination.
+4. Passenger selects Bajaj or Motorcycle.
+5. Passenger requests ride.
+6. System finds nearby available drivers.
+7. Drivers receive request.
+8. First driver who accepts gets the ride.
+9. Passenger tracks driver live.
+10. Driver starts trip.
+11. Driver completes trip.
+12. Passenger pays.
+13. Passenger rates driver.
+
+---
+
+Payment System
+
+Support Somalia payment methods:
+
+- EVC Plus
+- Sahal
+- eDahab
+- Kaah
+- Cash Payment
+
+Support currencies:
+
+- Somali Shilling (SOS)
+- US Dollar (USD)
+
+---
+
+Admin Dashboard
+
+Admin can manage:
+
+Drivers
+
+- View all drivers
+- View driver photos
+- View Bajaj plate numbers
+- View National ID/NIRA/Passport information
+- Approve drivers
+- Reject drivers
+- Block drivers
+
+Passengers
+
+- View users
+- Manage accounts
+
+Trips
+
+- View active trips
+- View completed trips
+- View cancelled trips
+
+Analytics
+
+Dashboard shows:
+
+- Total passengers
+- Total drivers
+- Active drivers
+- Active rides
+- Daily income
+- Monthly income
+- Popular areas
+
+---
+
+Somalia Localization
+
+Support:
+
+Languages:
+
+- Somali
+- English
+
+Cities:
+
+- Mogadishu
+- Hargeisa
+- Garowe
+- Bosaso
+- Kismayo
+- Baidoa
+- Beledweyne
+- Jowhar
+
+Features:
+
+- Somali interface
+- Local payment methods
+- Local transportation system
+
+---
+
+Database Models
+
+Create complete database schema:
+
+- Users
+- Passengers
+- Drivers
+- Vehicles
+- Bajaj
+- Motorcycle
+- Trips
+- Payments
+- Ratings
+- Notifications
+- Verification Documents
+- Admins
+- Cities
+- Settings
+
+Include:
+
+- Relationships
+- Validation
+- Security rules
+- Database migrations
+
+---
+
+UI/UX Design
+
+Create a professional modern interface:
+
+- Mobile-first design
+- Clean navigation
+- Modern cards
+- Map interface
+- Dark mode
+- Smooth animations
+- Easy Somali user experience
+
+---
+
+Security
+
+Implement:
+
+- Authentication
+- Role-based permissions
+- Secure document storage
+- Data validation
+- API protection
+- Admin access control
+
+---
+
+Final Deliverables
+
+Generate:
+
+- Complete source code
+- Mobile responsive interface
+- Passenger dashboard
+- Driver dashboard
+- Admin dashboard
+- Database schema
+- API system
+- Authentication
+- Real-time tracking
+- Installation guide
+- Deployment instructions
+
+The final application must be scalable, secure, and ready to be used as a real Bajaj and Motorcycle ride-hailing platform in Somalia.
