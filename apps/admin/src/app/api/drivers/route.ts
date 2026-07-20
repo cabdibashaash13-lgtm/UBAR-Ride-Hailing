@@ -34,7 +34,7 @@ export async function GET(request: Request) {
       prisma.driver.count({ where }),
     ]);
 
-    const formatted = drivers.map((d) => ({
+    const formatted = drivers.map((d: any) => ({
       id: d.id,
       fullName: d.user.fullName,
       phone: d.user.phone,
