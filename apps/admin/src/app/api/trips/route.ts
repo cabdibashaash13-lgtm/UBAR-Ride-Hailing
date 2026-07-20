@@ -4,11 +4,16 @@ import { prisma } from "@/lib/prisma";
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const status = searchParams.get("status");
-    const page = parseInt(searchParams.get("page") || "1");
-    const pageSize = parseInt(searchParams.get("pageSize") || "20");
 
-    const where = status ? { status } : {};
+    const status = searchParams.get("status");
+    const page = Number(searchParams.get("page") || "1");
+    const pageSize = Number(searchParams.get("pageSize") || "20");
+
+    const where: Record<string, unknown> = {};
+
+    if (status) {
+      where.status = status;
+    }
 
     const [trips, total] = await Promise.all([
       prisma.trip.findMany({
@@ -48,14 +53,14 @@ export async function GET(request: Request) {
 
     const formatted = trips.map((t: any) => ({
       id: t.id,
-      passengerName: t.passenger?.user?.fullName || "Unknown",
-      driverName: t.driver?.user?.fullName || null,
-      pickupAddress: t.pickupAddress || "Pickup",
-      dropoffAddress: t.dropoffAddress || "Dropoff",
+      passengerName: t.passenger?.user?.fullName ?? "Unknown",
+      driverName: t.driver?.user?.fullName ?? null,
+      pickupAddress: t.pickupAddress ?? "Pickup",
+      dropoffAddress: t.dropoffAddress ?? "Dropoff",
       fare: t.fare ?? 0,
       status: t.status,
       vehicleType: t.vehicleType,
-      createdAt: t.createdAt.toISOString(),
+      createdAt: t.createdAt?.toISOString?.() ?? null,
     }));
 
     return NextResponse.json({
@@ -71,8 +76,13 @@ export async function GET(request: Request) {
       error instanceof Error ? error.message : "Failed to fetch trips";
 
     return NextResponse.json(
-      { success: false, error: message },
-      { status: 500 }
+      {
+        success: false,
+        error: message,
+      },
+      {
+        status: 500,
+      }
     );
   }
 }
