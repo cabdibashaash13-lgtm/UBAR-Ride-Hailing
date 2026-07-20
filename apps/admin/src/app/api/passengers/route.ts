@@ -23,7 +23,7 @@ export async function GET(request: Request) {
       prisma.user.count({ where: { ...where, role: "PASSENGER" } }),
     ]);
 
-    const formatted = passengers.map((p: any) => ({
+   const formatted = passengers.map((p: any) => ({
       id: p.id,
       fullName: p.fullName,
       phone: p.phone,
