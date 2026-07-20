@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { TripStatus } from "@prisma/client";
 
 export async function GET(request: Request) {
   try {
@@ -9,28 +8,48 @@ export async function GET(request: Request) {
     const page = parseInt(searchParams.get("page") || "1");
     const pageSize = parseInt(searchParams.get("pageSize") || "20");
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const where: any = status ? { status: status as TripStatus } : {};
+    const where = status ? { status } : {};
 
     const [trips, total] = await Promise.all([
       prisma.trip.findMany({
         where,
         include: {
-          passenger: { include: { user: { select: { fullName: true, phone: true } } } },
-          driver: { include: { user: { select: { fullName: true, phone: true } }, vehicle: true } },
+          passenger: {
+            include: {
+              user: {
+                select: {
+                  fullName: true,
+                  phone: true,
+                },
+              },
+            },
+          },
+          driver: {
+            include: {
+              user: {
+                select: {
+                  fullName: true,
+                  phone: true,
+                },
+              },
+              vehicle: true,
+            },
+          },
           payment: true,
         },
-        orderBy: { requestedAt: "desc" },
+        orderBy: {
+          requestedAt: "desc",
+        },
         skip: (page - 1) * pageSize,
         take: pageSize,
       }),
       prisma.trip.count({ where }),
     ]);
 
-    const formatted = trips.map((t) => ({
+    const formatted = trips.map((t: any) => ({
       id: t.id,
       passengerName: t.passenger?.user?.fullName || "Unknown",
-      driverName: t.driver?.user?.fullName,
+      driverName: t.driver?.user?.fullName || null,
       pickupAddress: t.pickupAddress || "Pickup",
       dropoffAddress: t.dropoffAddress || "Dropoff",
       fare: t.fare ?? 0,
@@ -40,11 +59,20 @@ export async function GET(request: Request) {
     }));
 
     return NextResponse.json({
-      success: true, data: formatted, total, page, pageSize,
+      success: true,
+      data: formatted,
+      total,
+      page,
+      pageSize,
       totalPages: Math.ceil(total / pageSize),
     });
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : "Failed to fetch trips";
-    return NextResponse.json({ success: false, error: message }, { status: 500 });
+    const message =
+      error instanceof Error ? error.message : "Failed to fetch trips";
+
+    return NextResponse.json(
+      { success: false, error: message },
+      { status: 500 }
+    );
   }
 }
