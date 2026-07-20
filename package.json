@@ -7,6 +7,7 @@
     "packages/*"
   ],
   "scripts": {
+    "postinstall": "npm run generate --workspace=packages/prisma",
     "dev:passenger": "npm run dev --workspace=apps/passenger",
     "dev:driver": "npm run dev --workspace=apps/driver",
     "dev:admin": "npm run dev --workspace=apps/admin",
